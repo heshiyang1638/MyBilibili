@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>视频</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css"/>
+    <style>
+        /* 导航栏样式 */
+        .nav-container {
+            background: white;
+            box-shadow: 0 2px 10px rgba(255, 105, 180, 0.1);
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #e91e63;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #ff6b9c, #e91e63);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 24px;
+        }
+
+        .nav-menu a {
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .nav-menu a:hover {
+            color: #e91e63;
+            background: #fff0f5;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 20px;
+            padding: 8px 16px;
+            width: 300px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+            padding: 4px;
+        }
+
+        .search-icon {
+            color: #999;
+            cursor: pointer;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-btn {
+            background: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: #c2185b;
+        }
+
+        /* 原有样式保持不变 */
+        body {
+            background: linear-gradient(135deg, #ffe6f0 0%, #fff5f9 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .video-container-v1 {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(255, 105, 180, 0.1);
+            padding: 24px;
+            gap: 30px;
+        }
+
+        .video-title {
+            font-size: 20px;
+            font-family: PingFang SC, HarmonyOS_Regular, Helvetica Neue, Microsoft YaHei, sans-serif;
+            font-weight: 500;
+            -webkit-font-smoothing: antialiased;
+            color: #e91e63;
+            line-height: 24px;
+            margin-bottom: 6px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .video-data {
+            font-size: 13px;
+            color: #ff6b9c;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            height: 24px;
+            line-height: 18px;
+        }
+
+        .view,.dm,.pudate {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 12px;
+        }
+
+        .video-container-v1 {
+            max-width: 2540px;
+            min-width: 1080px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            box-sizing: content-box;
+            flex-direction: row;
+        }
+
+        .video-left {
+            width: 668px;
+        }
+
+        .video-right {
+            width: 350px;
+            background-color: #fff9fb;
+            border-radius: 12px;
+            margin-left: 20px;
+        }
+
+        .list-box {
+            padding: 8px 0;
+            margin: 0;
+        }
+
+        ol, ul {
+            list-style: none;
+            outline: none;
+            padding: 0;
+        }
+
+        .list-box li .link-content {
+            display: flex;
+            align-items: center;
+            flex-shrink: 1;
+            overflow: hidden;
+            gap: 8px;
+        }
+
+        .list-box li .clickitem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .list-box li {
+            display: block;
+            height: auto;
+            min-height: 40px;
+            line-height: 20px;
+            padding: 8px 12px;
+            color: #18191C;
+            margin: 4px 0;
+            transition: all 0.3s;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 338px;
+            box-sizing: border-box;
+        }
+
+        .list-box li:hover {
+            background-color: #fff0f5;
+        }
+
+        .list-box li.on {
+            background-color: #fff0f5;
+            border-left: 3px solid #ff6b9c;
+        }
+
+        a {
+            color: #222;
+            background-color: transparent;
+            text-decoration: none;
+            outline: none;
+            cursor: pointer;
+            transition: color .3s;
+        }
+
+        .desc-info {
+            transition: all 0.3s;
+            white-space: pre-line;
+            transition: height 0.3s;
+            font-size: 15px;
+            color: #18191C;
+            letter-spacing: 0;
+            line-height: 24px;
+            overflow: hidden;
+            background-color: #fff9fb;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #ff6b9c;
+        }
+
+        .s_tag-v1 {
+            padding-bottom: 6px;
+            margin: 16px 0 20px 0;
+            border-bottom: 1px solid #ffd6e6;
+            height: 40px;
+        }
+
+        .s_tag-v1 .tag-wrap {
+            transition: height 0.3s;
+        }
+
+        .s_tag-v1 .tag-wrap .tag-area {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+
+        .s_tag-v1 .tag-wrap .tag-area > li {
+            float: left;
+            margin: 0 12px 8px 0;
+            position: relative;
+            list-style: none;
+        }
+
+        .s_tag-v1 .tag-wrap .tag-area > li .tag-link {
+            color: #e91e63;
+            z-index: 10;
+            height: 28px;
+            line-height: 28px;
+            display: inline-block;
+            font-size: 13px;
+            padding: 0 12px;
+            box-sizing: border-box;
+            background: #fff0f5;
+            border-radius: 100px;
+            transition: all 0.3s;
+        }
+
+        .s_tag-v1 .tag-wrap .tag-area > li .tag-link:hover {
+            background: #ffd6e6;
+        }
+
+        .cur-list {
+            padding: 4px 0;
+            transition: all 0.3s;
+        }
+
+        .list-box li .page-num {
+            margin-right: 10px;
+            color: #e91e63;
+            font-size: 12px;
+            min-width: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .list-box li .part {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 1;
+            width: calc(100% - 60px);
+            font-size: 13px;
+        }
+
+        .list-box li .duration {
+            color: #ff6b9c;
+            justify-self: flex-end;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        li.on a {
+            color: #e91e63;
+        }
+
+        .head-con {
+            width: 350px;
+            display: flex;
+            padding: 14px 16px 0;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .head-con .head-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .head-con .head-left h3 {
+            font-size: 15px;
+            line-height: 20px;
+            font-family: PingFang SC, HarmonyOS_Regular, Helvetica Neue, Microsoft YaHei, sans-serif;
+            font-weight: 500;
+            -webkit-font-smoothing: antialiased;
+            margin-right: 4px;
+            color: #e91e63;
+        }
+
+        .head-con .head-left .cur-page {
+            font-size: 12px;
+            color: #ff6b9c;
+            line-height: 16px;
+        }
+
+        .list-box li svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .list-box li svg line {
+            stroke: #ff6b9c;
+        }
+
+        .video-data .emoji {
+            font-size: 16px;
+            margin-right: 4px;
+        }
+
+        #player {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(255, 105, 180, 0.15);
+        }
+
+        .cur-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .cur-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .cur-list::-webkit-scrollbar-track {
+            background: #ffe6f0;
+            border-radius: 10px;
+        }
+
+        .cur-list::-webkit-scrollbar-thumb {
+            background: #ffb6c1;
+            border-radius: 10px;
+        }
+
+        .cur-list::-webkit-scrollbar-thumb:hover {
+            background: #ff6b9c;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1024px) {
+            .navbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 10px 0;
+            }
+
+            .search-box {
+                width: 200px;
+            }
+
+            .video-container-v1 {
+                flex-direction: column;
+            }
+
+            .video-right {
+                width: 100%;
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 新增导航栏 -->
+<div class="nav-container">
+    <div class="navbar">
+        <div class="nav-left">
+            <a href="#" class="logo">
+                <div class="logo-icon">B</div>
+                <span>哔哩哔哩</span>
+            </a>
+            <ul class="nav-menu">
+                <li><a href="#">首页</a></li>
+                <li><a href="#">番剧</a></li>
+                <li><a href="#">直播</a></li>
+                <li><a href="#">游戏</a></li>
+                <li><a href="#">会员购</a></li>
+                <li><a href="#">漫画</a></li>
+                <li><a href="#">赛事</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="search-box">
+                <input type="text" placeholder="搜索视频、番剧、用户">
+                <span class="search-icon">🔍</span>
+            </div>
+            <button class="upload-btn">投稿</button>
+            <div class="user-avatar">
+                <img src="img/头像.png" alt="用户头像">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 原有内容保持不变 -->
+<div>
+    <div class="video-container-v1">
+        <div class="video-left">
+            <h1 class="video-title"></h1>
+            <div class="video-data">
+                    <span title="总播放数34158" class="view item">
+                        <span class="emoji">👁️</span>3.4万
+                    </span>
+                <span title="历史累计弹幕数235" class="dm item">
+                        <span class="emoji">💬</span>235
+                    </span>
+                <span title="发布时间" class="pudate item">
+                        <span class="emoji">📅</span><span class="date-text"></span>
+                    </span>
+            </div>
+            <video id="player" playsinline controls data-poster="" style="width:100%">
+                <!--<source src="/a-b顺序.mp4" type="video/mp4"/>-->
+
+                <!-- Captions are optional
+                <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default/>
+                -->
+            </video>
+            <div class="desc-info desc-v2" style="height: auto;"><span class="desc-info-text"></span></div>
+            <div id="v_tag" class="s_tag-v1" data-v-066e89c8="">
+                <div class="tag-wrap">
+                    <ul class="tag-area clearfix"></ul>
+                </div>
+            </div>
+        </div>
+        <div class="video-right">
+            <div class="head-con">
+                <div class="head-left"><h3>视频选集</h3><span class="cur-page">(0/0)</span>
+                    <div class="range-box"><i class="van-icon-general_viewlist"></i><!----></div>
+                </div>
+                <div class="head-right">
+                    <!--                    <span class="next-button"><span class="txt">自动连播</span><span class="switch-button on"></span></span>-->
+                </div>
+            </div>
+            <div class="cur-list">
+                <ul style="display:none;">
+                    <li id="template"><a href="/video/BV15T4y1e7Zq?p=1" class="" title="">
+                        <div class="clickitem">
+                            <div class="link-content">
+                                <svg viewBox="0 0 400 400" width="30" height="30" xmlns="http://www.w3.org/2000/svg">
+                                    <g>
+                                        <line class="p1" y2="215" x2="100" y1="185" x1="100" stroke-width="30" fill="none"/>
+                                        <line class="p2" y2="215" x2="200" y1="185" x1="200" stroke-width="30" fill="none"/>
+                                        <line class="p3" y2="215" x2="300" y1="185" x1="300" stroke-width="30" fill="none"/>
+                                    </g>
+                                </svg>
+                                <span class="page-num"></span><span class="part"></span>
+                            </div>
+                            <div class="duration"></div>
+                        </div>
+                    </a></li>
+                </ul>
+                <ul class="list-box"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/common.js"></script>
+<script src="js/plyr.js"></script>
+<script src="js/gsap.min.js"></script>
+<script>
+    // 日期格式化函数
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}年${month}月${day}日 ${hours}:${minutes}`;
+    }
+
+    let tlArray = [];
+    let liArray = [];
+    let urlArray = [];
+    let currentPlayer;
+    function loadData() {
+        const bv = location.hash.substr(1);
+        if(bv) {
+            fetch(host + "/video/" + bv)
+                .then(resp=>resp.json())
+                .then(video=>{
+                    tlArray = [];
+                    liArray = [];
+                    urlArray = [];
+                    const listUl = document.querySelector(".list-box");
+                    listUl.innerHTML = "";
+                    const ul = document.querySelector(".tag-area");
+                    ul.innerHTML = "";
+
+                    document.title = video.title;
+                    document.querySelector(".video-title").innerText = video.title;
+                    // 修改时间显示格式
+                    document.querySelector(".date-text").innerText = formatDate(video.publishTime);
+                    document.querySelector(".desc-info-text").innerText = video.introduction;
+                    if(currentPlayer == null) {
+                        //document.querySelector("#player").dataset.poster = "/img/" + video.cover;
+                        currentPlayer = new Plyr('#player');
+                    }
+                    // <li class="tag"><a href="//www.bilibili.com/v/tech/" target="_blank" class="tag-link">科技</a></li>
+                    let tags = video.tagList;
+                    for(let i = 0; i < tags.length; i++) {
+                        const li = document.createElement("li");
+                        li.className = "tag";
+                        const a = document.createElement("a");
+                        a.className = "tag-link";
+                        a.innerText = tags[i];
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    }
+
+                    let playList = video.playList;
+
+                    for(let i = 0; i < playList.length; i++) {
+                        let play = playList[i];
+                        let title = play.title;
+                        //title = title.substring(0, title.lastIndexOf("."));
+                        const li = document.querySelector("#template").cloneNode(true);
+                        li.removeAttribute("id");
+                        const a = li.querySelector("a");
+                        a.href = `javascript:void(0)`;
+                        a.title = title;
+                        a.dataset.i = i;
+                        a.onclick = function() {
+                            liArray.forEach(l=>l.className="");
+                            liArray[this.dataset.i].className="on";
+                            tlArray.forEach(t=>t.pause(0));
+                            tlArray[this.dataset.i].resume();
+                            document.querySelector(".cur-page").innerText = `${this.dataset.i-0+1}/${playList.length}`;
+                            currentPlayer.source = {
+                                type: 'video',
+                                sources: [
+                                    {
+                                        src: '/play/' + urlArray[this.dataset.i],
+                                        type: 'video/mp4',
+                                    }
+                                ]
+                            };
+                        };
+                        li.querySelector(".page-num").innerText = play.id;
+                        li.querySelector(".part").innerText = title;
+                        li.querySelector(".duration").innerText = play.duration;
+
+                        const svg = li.querySelector("svg");
+                        let lines = [svg.querySelector(".p1"),svg.querySelector(".p2"),svg.querySelector(".p3")];
+                        let tl = gsap.timeline({repeat: -1});
+                        tl.to(lines, {
+                            duration: .5,
+                            scaleY: 8,
+                            transformOrigin: "center",
+                            stagger: .1
+                        })
+                        tl.to(lines, {
+                            duration: .5,
+                            scaleY: 1,
+                            transformOrigin: "center",
+                            stagger: .1
+                        })
+                        tl.pause();
+                        tlArray.push(tl);
+                        liArray.push(li);
+                        urlArray.push(play.url);
+                        listUl.appendChild(li);
+                    }
+                    if(liArray.length > 0) {
+                        liArray[0].className="on";
+                        tlArray[0].resume();
+                        document.querySelector(".cur-page").innerText = `1/${playList.length}`;
+                    }
+                    currentPlayer.source = {
+                        type: 'video',
+                        sources: [
+                            {
+                                src: '/play/' + urlArray[0],
+                                type: 'video/mp4'
+                            }
+                        ],
+                        poster: '/img/' + video.cover
+                    };
+                });
+        }
+    }
+
+    window.addEventListener('load', loadData, false);
+
+    window.addEventListener('hashchange', loadData, false);
+</script>
+</body>
+</html>
